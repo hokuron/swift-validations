@@ -1,6 +1,6 @@
 # Swift Validations
 
-宣言的にルールを定義してバリデーションを構築するためのライブラリです。
+宣言的にルールを定義してバリデーションを構築するためのライブラリー。
 
 ## Overview
 
@@ -174,14 +174,14 @@ Format(of: productCode, with: predefinedRegex)
 このバリデーターは、2つの値の比較を検証します。
 
 ```swift
-Comparison(statDate, .lessThanOrEqualTo(endDate))
+Comparison(startDate, .lessThanOrEqualTo(endDate))
 ```
 
 第二引数に指定する値は、比較演算子と対応するものが用意されています。
 
 検証する値は、基本的に`Comparable`に準拠する必要があります。  
 ただし、`String`を除く`Array`などのコレクションは`Comparable`には準拠していませんが、要素が`Comparable`に準拠していれば検証することができます。  
-この検証には、[`lexicographicallyPrecedes(_:)`](https://developer.apple.com/documentation/swift/array/lexicographicallyprecedes(_:))が用いられます。
+この検証には、[`lexicographicallyPrecedes(_:)`](https://developer.apple.com/documentation/swift/sequence/lexicographicallyprecedes(_:))が用いられます。
 
 ```swift
 let currentVersion = [5, 10, 0]
@@ -218,15 +218,14 @@ Count(productCode, exact: 8)
 
 ### `Validate`
 
-このバリデーターそのものは、何かを検証する機能は持っておらず、initに与えた検証を実行します。  
+このバリデーター自身は、何かを検証する機能は持っておらず、initに与えた検証を実行します。  
 initは3種類用意されています。
 
 - Errorを投げられるクロージャー (`() throws -> Void`)を受け取り
 - `ValidatorBuilder`クロージャーを受け取る
 - Type-erases a validator
 
-このバリデーターは、基本的に[Overview](#Overview)で説明したモデルなどに組み込まない独立した利用が想定されます。  
-既存のバリデーターを組み合わせて任意の新しいバリデーターを作ることもできます。
+このバリデーターを使うことで`Validator` protocolに準拠した新しいバリデーターを実装することなしに、既存のバリデーターを組み合わせて任意の新しいバリデーターの構築が可能です。
 
 ## Presence Modifiers
 
@@ -240,6 +239,23 @@ initは3種類用意されています。
 ```swift
 Comparison(age, .greaterThan(16))
     .allowsNil(!isLoggedIn)
+```
+
+`Validator` protocolに準拠した独自のカスタムバリデーターを`PresenceValidatable` protocolに準拠させることで同様の機能を提供可能になります。
+
+```swift
+struct CustomValidator<Value>: Validator, PresenceValidatable {
+    var value: Value?
+    var presenceOption: PresenceOption = .required
+
+    func validate() throws {
+        guard let presenceValue = try validatePresence() else {
+            return
+        }
+
+        // Validate with `presenceValue`
+    }
+}
 ```
 
 ## Validation Errors

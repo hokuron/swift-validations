@@ -88,7 +88,7 @@ do {
 ### `Presence` / `Absence`
 
 These validators check if a value is `nil` or, in the case of collections, empty.  
-`Presence` fails if the value is `nil` or empty. `Absence` fails if the value is **not** `nil` or not empty.
+`Presence` fails if the value is `nil` or empty. `Absence` fails if the value is **not** `nil` or **not** empty.
 
 ```swift
 Presence(name)
@@ -174,13 +174,13 @@ Format(of: productCode, with: predefinedRegex)
 This validator checks the comparison between two values.
 
 ```swift
-Comparison(statDate, .lessThanOrEqualTo(endDate))
+Comparison(startDate, .lessThanOrEqualTo(endDate))
 ```
 
 The second argument specifies the comparison operator. 
 
 The value to be validated generally needs to conform to Comparable.  
-Although collections like Array do not conform to Comparable, if their elements do, they can be validated using this validator via the [`lexicographicallyPrecedes(_:)`](https://developer.apple.com/documentation/swift/array/lexicographicallyprecedes(_:)) method.
+Although collections like Array do not conform to Comparable, if their elements do, they can be validated using this validator via the [`lexicographicallyPrecedes(_:)`](https://developer.apple.com/documentation/swift/sequence/lexicographicallyprecedes(_:)) method.
 
 ```swift
 let currentVersion = [5, 10, 0]
@@ -217,15 +217,14 @@ Count(productCode, exact: 8)
 
 ### `Validate`
 
-This validator doesn't perform any validation itself but executes the validations given to its initializer.  
+This validator itself does not perform any validation but executes the validation provided in the initializer.
 There are three initializers:
 
 - Accepts a closure that throws an error (`() throws -> Void`).
 - Accepts a `ValidatorBuilder` closure.
 - Type-erases a validator.
 
-This validator is generally intended for independent use rather than incorporation into models as described in the [Overview](#Overview).  
-You can also combine existing validators to create a new custom validator.
+Using this validator, you can build custom validators by combining existing ones without implementing a new validator conforming to the `Validator` protocol.
 
 ## Presence Modifiers
 
@@ -241,10 +240,27 @@ Comparison(age, .greaterThan(16))
     .allowsNil(!isLoggedIn)
 ```
 
+You can provide similar functionality to custom validators conforming to the `Validator` protocol by conforming to the `PresenceValidatable` protocol.
+
+```swift
+struct CustomValidator<Value>: Validator, PresenceValidatable {
+    var value: Value?
+    var presenceOption: PresenceOption = .required
+
+    func validate() throws {
+        guard let presenceValue = try validatePresence() else {
+            return
+        }
+
+        // Validate with `presenceValue`
+    }
+}
+```
+
 ## Validation Errors
 
 When validation fails, either a `ValidationError` or `ValidationErrors` is thrown. These errors correspond to whether the validation failure is singular or multiple, respectively.   
-For example, when using a validator independently (excluding Validate), a `ValidationError` is thrown upon validation failure.
+For example, when using a validator independently (excluding `Validate`), a `ValidationError` is thrown upon validation failure.
 
 ### `ValidationError`
 
