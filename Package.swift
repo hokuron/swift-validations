@@ -24,12 +24,18 @@ let package = Package(
         .target(
             name: "Validations",
             swiftSettings: [
-                .enableExperimentalFeature("StrictConcurrency")
+                .enableExperimentalFeature("StrictConcurrency"),
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("GlobalConcurrency"),
             ]
         ),
         .testTarget(
             name: "ValidationsTests",
-            dependencies: ["Validations"]
+            dependencies: ["Validations"],
+            swiftSettings: [
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("GlobalConcurrency"),
+            ]
         ),
     ]
 )
