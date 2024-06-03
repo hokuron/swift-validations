@@ -24,8 +24,8 @@ struct User: Validator {
     var confirmedPassword: String
 
     var validation: some Validator {
-        Presence(name)
-        Comparison(age, .greaterThan(16))
+        Presence(of: name)
+        Comparison(of: age, .greaterThan(16))
 
         Format(of: email) {
             ZeroOrMore {
@@ -42,13 +42,13 @@ struct User: Validator {
         }
         .allowsNil()
 
-        Presence(bio)
+        Presence(of: bio)
             .allowsNil()
             .allowsEmpty()
 
         address
 
-        Presence(password)
+        Presence(of: password)
             .allowsEmpty()
 
         Confirmation(of: confirmedPassword, matching: password)
@@ -69,7 +69,7 @@ do {
 import Validations
 
 do {
-    try Count(interests, within: 3...).validate()
+    try Count(of: interests, within: 3...).validate()
 } catch {
     //...
 }
@@ -91,9 +91,9 @@ do {
 `Presence`は、`nil`または空の場合、検証に失敗します。`Absence`はその逆で、`nil`または空**でなければ**検証に失敗します。
 
 ```swift
-Presence(name)
-Presence(email)
-Absence(cancellationDate)
+Presence(of: name)
+Presence(of: email)
+Absence(of: cancellationDate)
 ```
 
 ### `Confirmation`
@@ -174,7 +174,7 @@ Format(of: productCode, with: predefinedRegex)
 このバリデーターは、2つの値の比較を検証します。
 
 ```swift
-Comparison(startDate, .lessThanOrEqualTo(endDate))
+Comparison(of: startDate, .lessThanOrEqualTo(endDate))
 ```
 
 第二引数に指定する値は、比較演算子と対応するものが用意されています。
@@ -186,7 +186,7 @@ Comparison(startDate, .lessThanOrEqualTo(endDate))
 ```swift
 let currentVersion = [5, 10, 0]
 let requiredVersion = [6, 0, 0]
-Comparison(currentVersion, .greaterThanOrEqualTo(requiredVersion)).isValid // => false
+Comparison(of: currentVersion, .greaterThanOrEqualTo(requiredVersion)).isValid // => false
 ```
 
 ### `Inclusion` / `Exclusion`
@@ -195,15 +195,15 @@ Comparison(currentVersion, .greaterThanOrEqualTo(requiredVersion)).isValid // =>
 `Inclusion`では指定した値が含まれていなければ検証に失敗します。反対に`Exclusion`は、指定した値が含まれていれば検証に失敗します。
 
 ```swift
-Inclusion(articleStatus, in: [.published, .secret])
-Exclusion(permission, in: [.reader, .editor])
+Inclusion(of: articleStatus, in: [.published, .secret])
+Exclusion(of: permission, in: [.reader, .editor])
 ```
 
 コレクションだけでなく範囲の検証も可能です。
 
 ```swift
-Inclusion(age, in: 16...)
-Exclusion(age, in: ..<16)
+Inclusion(of: age, in: 16...)
+Exclusion(of: age, in: ..<16)
 ```
 
 ### `Count`
@@ -211,9 +211,9 @@ Exclusion(age, in: ..<16)
 このバリデーターは、`String`を含むコレクションの数が指定した範囲内かどうかを検証します。
 
 ```swift
-Count(interests, within: 3...)
-Count(username, within: 1..<20)
-Count(productCode, exact: 8)
+Count(of: interests, within: 3...)
+Count(of: username, within: 1..<20)
+Count(of: productCode, exact: 8)
 ```
 
 ### `Validate`
@@ -237,7 +237,7 @@ initは3種類用意されています。
 引数として`Bool`を取るので、特定条件下では検証をスキップする、といった挙動にすることもできます。
 
 ```swift
-Comparison(age, .greaterThan(16))
+Comparison(of: age, .greaterThan(16))
     .allowsNil(!isLoggedIn)
 ```
 
@@ -275,7 +275,7 @@ struct User: Validator {
     // ...
 
     var validation: some Validator {
-        Presence(name)
+        Presence(of: name)
             .errorKey(\Self.name)
         // ...
     }
@@ -293,8 +293,8 @@ struct User: Validator {
 
 ```swift
 Validate {
-    Presence(username)
-    Count(bio, within: 0...1000)
+    Presence(of: username)
+    Count(of: bio, within: 0...1000)
 }
 .errorKey("Profile")
 ```

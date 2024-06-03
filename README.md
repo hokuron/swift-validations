@@ -24,8 +24,8 @@ struct User: Validator {
     var confirmedPassword: String
 
     var validation: some Validator {
-        Presence(name)
-        Comparison(age, .greaterThan(16))
+        Presence(of: name)
+        Comparison(of: age, .greaterThan(16))
 
         Format(of: email) {
             ZeroOrMore {
@@ -42,13 +42,13 @@ struct User: Validator {
         }
         .allowsNil()
 
-        Presence(bio)
+        Presence(of: bio)
             .allowsNil()
             .allowsEmpty()
 
         address
 
-        Presence(password)
+        Presence(of: password)
             .allowsEmpty()
 
         Confirmation(of: confirmedPassword, matching: password)
@@ -91,9 +91,9 @@ These validators check if a value is `nil` or, in the case of collections, empty
 `Presence` fails if the value is `nil` or empty. `Absence` fails if the value is **not** `nil` or **not** empty.
 
 ```swift
-Presence(name)
-Presence(email)
-Absence(cancellationDate)
+Presence(of: name)
+Presence(of: email)
+Absence(of: cancellationDate)
 ```
 
 ### `Confirmation`
@@ -174,7 +174,7 @@ Format(of: productCode, with: predefinedRegex)
 This validator checks the comparison between two values.
 
 ```swift
-Comparison(startDate, .lessThanOrEqualTo(endDate))
+Comparison(of: startDate, .lessThanOrEqualTo(endDate))
 ```
 
 The second argument specifies the comparison operator. 
@@ -185,7 +185,7 @@ Although collections like Array do not conform to Comparable, if their elements 
 ```swift
 let currentVersion = [5, 10, 0]
 let requiredVersion = [6, 0, 0]
-Comparison(currentVersion, .greaterThanOrEqualTo(requiredVersion)).isValid // => false
+Comparison(of: currentVersion, .greaterThanOrEqualTo(requiredVersion)).isValid // => false
 ```
 
 ### `Inclusion` / `Exclusion`
@@ -194,15 +194,15 @@ These validators check for inclusion or exclusion within a set of values.
 `Inclusion` fails if the value is not included in the specified set, while `Exclusion` fails if it is included.
 
 ```swift
-Inclusion(articleStatus, in: [.published, .secret])
-Exclusion(permission, in: [.reader, .editor])
+Inclusion(of: articleStatus, in: [.published, .secret])
+Exclusion(of: permission, in: [.reader, .editor])
 ```
 
 They also support range validations.
 
 ```swift
-Inclusion(age, in: 16...)
-Exclusion(age, in: ..<16)
+Inclusion(of: age, in: 16...)
+Exclusion(of: age, in: ..<16)
 ```
 
 ### `Count`
@@ -210,9 +210,9 @@ Exclusion(age, in: ..<16)
 This validator checks if the count of a collection, including `String`, falls within a specified range.
 
 ```swift
-Count(interests, within: 3...)
-Count(username, within: 1..<20)
-Count(productCode, exact: 8)
+Count(of: interests, within: 3...)
+Count(of: username, within: 1..<20)
+Count(of: productCode, exact: 8)
 ```
 
 ### `Validate`
@@ -236,7 +236,7 @@ Most built-in validators can be modified with `allowsNil()` and `allowsEmpty()` 
 These modifiers take a `Bool` argument, allowing for conditional skipping of validations.
 
 ```swift
-Comparison(age, .greaterThan(16))
+Comparison(of: age, .greaterThan(16))
     .allowsNil(!isLoggedIn)
 ```
 

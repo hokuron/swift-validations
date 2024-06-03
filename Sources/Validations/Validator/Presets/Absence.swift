@@ -2,7 +2,7 @@ public struct Absence<Value>: Validator {
     public var value: Value?
 
     @inlinable
-    public init(_ value: Value?) {
+    public init(of value: Value?) {
         self.value = value
     }
 

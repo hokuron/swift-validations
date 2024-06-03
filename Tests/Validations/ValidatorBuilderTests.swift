@@ -12,15 +12,15 @@ final class ValidatorBuilderTests: XCTestCase {
             var agreed: Bool
 
             var validation: some Validator {
-                Presence(name)
-                Presence(email)
+                Presence(of: name)
+                Presence(of: email)
                 if let email {
                     Confirmation(of: confirmedEmail, matching: email)
                 } else {
-                    Inclusion(agreed, in: [false])
+                    Inclusion(of: agreed, in: [false])
                 }
 
-                Inclusion(agreed, in: [true])
+                Inclusion(of: agreed, in: [true])
             }
         }
 

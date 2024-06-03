@@ -3,7 +3,7 @@ public struct Presence<Value>: Validator, PresenceValidatable {
     public var presenceOption: PresenceOption = .required
 
     @inlinable
-    public init(_ value: Value?) {
+    public init(of value: Value?) {
         self.value = value
     }
 

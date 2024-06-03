@@ -8,13 +8,13 @@ public struct Count<Value: Collection, Range: RangeExpression<Int>>: Validator {
     var allowsNil = false
 
     @inlinable
-    public init(_ value: Value?, within range: Range) {
+    public init(of value: Value?, within range: Range) {
         self.value = value
         self.range = range
     }
 
     @inlinable
-    public init(_ value: Value?, exact count: Int) where Range == ClosedRange<Int> {
+    public init(of value: Value?, exact count: Int) where Range == ClosedRange<Int> {
         self.value = value
         self.range = count...count
     }
@@ -41,3 +41,5 @@ public struct Count<Value: Collection, Range: RangeExpression<Int>>: Validator {
 }
 
 extension Count: Sendable where Value: Sendable, Range: Sendable {}
+extension Count: Equatable where Value: Equatable, Range: Equatable {}
+extension Count: Hashable where Value: Hashable, Range: Hashable {}

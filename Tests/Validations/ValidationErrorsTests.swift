@@ -25,9 +25,9 @@ final class ValidationErrorsTests: XCTestCase {
             var name = ""
 
             var validation: some Validator {
-                Count(name, within: 4...)
+                Count(of: name, within: 4...)
                     .errorKey(\Test.name)
-                Inclusion(name, in: "Swift")
+                Inclusion(of: name, in: "Swift")
                     .errorKey(\Test.name)
             }
         }

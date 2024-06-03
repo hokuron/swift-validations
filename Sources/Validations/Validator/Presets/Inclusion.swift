@@ -7,14 +7,14 @@ public struct Inclusion<Value, Member: _Clusivity.Member>: Validator, PresenceVa
     public var presenceOption: PresenceOption = .required
 
     @inlinable
-    public init<M: Collection<Value>>(_ value: Value?, in member: M)
+    public init<M: Collection<Value>>(of value: Value?, in member: M)
     where Member == _Clusivity.CollectionMember<M> {
         self.value = value
         self.member = _Clusivity.CollectionMember(base: member)
     }
 
     @inlinable
-    public init<M: Collection<Value.Element>>(_ value: Value?, in member: M)
+    public init<M: Collection<Value.Element>>(of value: Value?, in member: M)
     where Value: Collection, Member == _Clusivity.CollectionMember<M> {
         self.value = value
         self.member = _Clusivity.CollectionMember(base: member)
@@ -22,14 +22,14 @@ public struct Inclusion<Value, Member: _Clusivity.Member>: Validator, PresenceVa
 
 
     @inlinable
-    public init<R: RangeExpression<Value>>(_ element: Value?, in range: R)
+    public init<R: RangeExpression<Value>>(of element: Value?, in range: R)
     where Member == _Clusivity.RangeMember<R> {
         self.value = element
         self.member = _Clusivity.RangeMember(base: range)
     }
 
     @inlinable
-    public init<R: RangeExpression<Value.Element>>(_ value: Value?, in range: R)
+    public init<R: RangeExpression<Value.Element>>(of value: Value?, in range: R)
     where Value: Collection, Member == _Clusivity.RangeMember<R> {
         self.value = value
         self.member = _Clusivity.RangeMember(base: range)
@@ -54,3 +54,7 @@ public struct Inclusion<Value, Member: _Clusivity.Member>: Validator, PresenceVa
         }
     }
 }
+
+extension Inclusion: Sendable where Value: Sendable, Member: Sendable {}
+extension Inclusion: Equatable where Value: Equatable, Member: Equatable {}
+extension Inclusion: Hashable where Value: Hashable, Member: Hashable {}

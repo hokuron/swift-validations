@@ -71,19 +71,19 @@ public struct Comparison<Value: Comparable>: Validator, PresenceValidatable {
     public var presenceOption: PresenceOption = .required
 
     @inlinable
-    public init(_ value: Value?, _ operator: Operator) where Value: StringProtocol {
+    public init(of value: Value?, _ operator: Operator) where Value: StringProtocol {
         self.value = value
         self.operator = `operator`
     }
 
     @inlinable
-    public init<C: Collection>(_ value: C?, _ operator: Operator) where C.Element: Comparable, Value == _LexicographicCollection<C> {
+    public init<C: Collection>(of value: C?, _ operator: Operator) where C.Element: Comparable, Value == _LexicographicCollection<C> {
         self.value = value.map(_LexicographicCollection.init(collection:))
         self.operator = `operator`
     }
 
     @inlinable
-    public init(_ value: Value?, _ operator: Operator) {
+    public init(of value: Value?, _ operator: Operator) {
         self.value = value
         self.operator = `operator`
     }

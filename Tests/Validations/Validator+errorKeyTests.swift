@@ -16,7 +16,7 @@ final class ValidatorErrorKeyTests: XCTestCase {
             var name: String?
 
             var validation: some Validator {
-                Presence(name)
+                Presence(of: name)
                     .errorKey(\SUT.name)
             }
         }
@@ -34,15 +34,15 @@ final class ValidatorErrorKeyTests: XCTestCase {
             var age = 10
 
             var validation: some Validator {
-                Presence(name)
+                Presence(of: name)
                     .errorKey("presence")
 
                 if name == nil {
-                    Count(name, exact: 0)
+                    Count(of: name, exact: 0)
                         .errorKey("count")
                 }
 
-                Comparison(age, .greaterThan(18))
+                Comparison(of: age, .greaterThan(18))
                     .errorKey("comparison")
             }
         }
@@ -56,20 +56,20 @@ final class ValidatorErrorKeyTests: XCTestCase {
 
             struct Child: Validator {
                 var validation: some Validator {
-                    Presence("")
+                    Presence(of: "")
                         .errorKey("child presence")
-                    Count("", within: 10...)
-                    Absence("abc")
+                    Count(of: "", within: 10...)
+                    Absence(of: "abc")
                 }
             }
 
             var validation: some Validator {
-                Presence("")
+                Presence(of: "")
                     .errorKey("parent presence")
                 child
                     .errorKey("overwritten key")
-                Presence("")
-                Absence("abc")
+                Presence(of: "")
+                Absence(of: "abc")
                     .errorKey("parent absence")
             }
         }
