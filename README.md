@@ -83,6 +83,7 @@ do {
 - [`Comparison`](#Comparison)
 - [`Exclusion` / `Inclusion`](#inclusion--exclusion)
 - [`Count`](#Count)
+- [`AnyOf`](#AnyOf)
 - [`Validate`](#Validate)
 
 ### `Presence` / `Absence`
@@ -295,6 +296,30 @@ Validate {
 .errorKey("Profile")
 ```
 
+### `AnyOf`
+
+This validator checks if any of the values provided in the first argument pass the validation specified in the second argument.
+
+```swift
+import RegexBuilder
+AnyOf([email1, email2, email3]) {
+    Format(of: $0) {
+        ZeroOrMore {
+            OneOrMore(.word)
+            "."
+        }
+        OneOrMore(.word)
+        "@"
+        OneOrMore(.word)
+        OneOrMore {
+            "."
+            OneOrMore(.word)
+        }
+    }
+}
+
+AnyOf([givenName, middleName, familyName], pass: Presence.init)
+```
 
 ### `ValidationErrors`
 
