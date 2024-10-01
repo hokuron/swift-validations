@@ -39,6 +39,8 @@ extension ValidationError {
         public static let inclusion = Self(rawValue: 1 << 12)
         public static let count = Self(rawValue: 1 << 13)
 
+        public static let `any` = Self(rawValue: 1 << 14)
+
         public let rawValue: Int
         public init(rawValue: Int) {
             self.rawValue = rawValue
