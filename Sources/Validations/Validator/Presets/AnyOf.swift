@@ -2,8 +2,10 @@ public struct AnyOf: Validator {
     @usableFromInline
     let _validate: () throws -> Void
 
-    public init<Value>(_ values: some Sequence<Value>, @ValidatorBuilder pass build: @escaping (Value) -> some Validator) {
+    public init<Value>(_ values: some Collection<Value>, @ValidatorBuilder pass build: @escaping (Value) -> some Validator) {
         self._validate = {
+            guard !values.isEmpty else { return }
+
             var errors = [ValidationError]()
 
             for value in values {

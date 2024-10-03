@@ -50,6 +50,10 @@ final class AnyOfTests: XCTestCase {
         )
     }
 
+    func testEmptyValues() {
+        XCTAssertNoThrow(try AnyOf([String](), pass: Presence.init).validate())
+    }
+
     func testOuterErrorKey() {
         let errorKey = "ErrorKey"
         let sut = AnyOf(["", ""]) {
@@ -103,5 +107,4 @@ final class AnyOfTests: XCTestCase {
         XCTAssertEqual(sut.validationErrors?[innerErrorKey2].count, 2)
         XCTAssertEqual(sut.validationErrors?.reasons(for: innerErrorKey2), [.count])
     }
-
 }
