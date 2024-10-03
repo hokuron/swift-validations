@@ -21,11 +21,15 @@ final class ValidatorBuilderTests: XCTestCase {
                 }
 
                 Inclusion(of: agreed, in: [true])
+
+                for str in [name, email] {
+                    Count(of: str, within: 1...)
+                }
             }
         }
 
         XCTAssertNoThrow(try SUT(name: "A B", email: "mail@example.com", agreed: true).validate())
-        XCTAssertEqual(SUT(name: "", email: "mail@example.com", agreed: false).validationErrors?.reasons, [.empty, .inclusion])
+        XCTAssertEqual(SUT(name: "", email: "mail@example.com", agreed: false).validationErrors?.reasons, [.empty, .inclusion, .count])
     }
 
     // MARK: - Compile time tests.
@@ -94,6 +98,18 @@ final class ValidatorBuilderTests: XCTestCase {
             var validation: some Validator {
                 if Bool.random() {
                     Test.Empty()
+                }
+            }
+        }
+
+        XCTAssertNoThrow(try SUT().validate())
+    }
+
+    func testArray() {
+        struct SUT: Validator {
+            var validation: some Validator {
+                for n in [1, 2, 3] {
+                    Presence(of: n)
                 }
             }
         }

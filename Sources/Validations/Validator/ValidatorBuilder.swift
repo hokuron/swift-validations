@@ -21,6 +21,11 @@ public enum ValidatorBuilder {
     }
 
     @inlinable
+    public static func buildArray<V: Validator>(_ validators: [V]) -> _ValidatorArray<V> {
+        _ValidatorArray(elements: validators)
+    }
+
+    @inlinable
     public static func buildOptional<V: Validator>(_ validator: V?) -> V? {
         validator
     }
@@ -60,6 +65,41 @@ public enum ValidatorBuilder {
             ]
             .compactMap { $0 }
             .flatMap { $0 }
+
+            if !errors.isEmpty {
+                throw ValidationErrors(errors)
+            }
+        }
+
+        @usableFromInline
+        func _validate(using validator: some Validator) -> ValidationErrors? {
+            do {
+                try validator.validate()
+                return nil
+            } catch let error as ValidationError {
+                return ValidationErrors([error])
+            } catch let errors as ValidationErrors {
+                return errors
+            } catch {
+                preconditionFailure("Unknown error: \(error)")
+            }
+        }
+    }
+
+    public struct _ValidatorArray<Element: Validator>: Validator {
+        @usableFromInline
+        let elements: [Element]
+
+        @usableFromInline
+        init(elements: [Element]) {
+            self.elements = elements
+        }
+
+        @inlinable
+        public func validate() throws {
+            let errors = elements
+                .compactMap(_validate(using:))
+                .flatMap { $0 }
 
             if !errors.isEmpty {
                 throw ValidationErrors(errors)
