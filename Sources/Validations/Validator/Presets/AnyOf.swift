@@ -2,6 +2,7 @@ public struct AnyOf: Validator {
     @usableFromInline
     let _validate: () throws -> Void
 
+    @inlinable
     public init<Value>(_ values: some Collection<Value>, @ValidatorBuilder pass build: @escaping (Value) -> some Validator) {
         self._validate = {
             guard !values.isEmpty else { return }
