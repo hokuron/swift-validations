@@ -26,6 +26,17 @@ public struct AnyOf: Validator {
         }
     }
 
+    @inlinable
+    public init<Value>(_ values: some Collection<Value>, pass keyPath: KeyPath<Value, some Validator>) {
+        self.init(values) { $0[keyPath: keyPath] }
+    }
+
+    @inlinable
+    public init(_ values: some Collection<some Validator>) {
+        self.init(values, pass: \.self)
+    }
+
+    @inlinable
     public func validate() throws {
         try _validate()
     }

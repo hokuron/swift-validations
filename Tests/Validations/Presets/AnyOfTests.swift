@@ -54,6 +54,27 @@ final class AnyOfTests: XCTestCase {
         XCTAssertNoThrow(try AnyOf([String](), pass: Presence.init).validate())
     }
 
+    func testInitWithValidatorValues() {
+        struct Value: Validator {
+            var validation: some Validator { Presence(of: "") }
+        }
+
+        XCTAssertThrowsError(try AnyOf([Value(), Value()]).validate())
+    }
+
+    func testInitWithKeyPath() {
+        struct Value {
+            var inner: Inner
+
+            struct Inner: Validator {
+                var value: String
+                var validation: some Validator { Presence(of: value) }
+            }
+        }
+
+        XCTAssertNoThrow(try AnyOf([Value(inner: .init(value: "")), Value(inner: .init(value: "A"))], pass: \.inner).validate())
+    }
+
     func testOuterErrorKey() {
         let errorKey = "ErrorKey"
         let sut = AnyOf(["", ""]) {
