@@ -15,6 +15,8 @@ public enum _Clusivity {
             self.base = base
         }
 
+        @inlinable
+        @inline(__always)
         public func contains(_ other: some Collection<Element>) -> Bool {
             base.contains(other)
         }
@@ -32,6 +34,7 @@ public enum _Clusivity {
         }
 
         @inlinable
+        @inline(__always)
         public func contains(_ other: some Collection<Element>) -> Bool {
             other.allSatisfy(base.contains(_:))
         }
