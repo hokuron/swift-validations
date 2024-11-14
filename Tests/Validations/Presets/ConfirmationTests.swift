@@ -13,6 +13,7 @@ final class ConfirmationTests: XCTestCase {
         XCTAssertNoThrow(try Confirmation(of: "123", matching: "123").validate())
     }
 
+    @MainActor
     func testStringWithPresenceOptions() throws {
         try XCTContext.runActivity(named: "nil disallowed") { _ in
             XCTAssertThrowsError(try Confirmation(of: nil, matching: "123").presence(.required(allowsEmpty: true)).validate())
@@ -47,6 +48,7 @@ final class ConfirmationTests: XCTestCase {
         XCTAssertNoThrow(try Confirmation(of: [Int](), matching: []).validate())
     }
 
+    @MainActor
     func testArrayWithPresenceOptions() throws {
         try XCTContext.runActivity(named: "nil disallowed") { _ in
             XCTAssertThrowsError(try Confirmation(of: nil, matching: [1, 2, 3]).presence(.required(allowsEmpty: true)).validate())

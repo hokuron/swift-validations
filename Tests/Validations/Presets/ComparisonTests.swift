@@ -62,6 +62,7 @@ final class ComparisonTests: XCTestCase {
         XCTAssertThrowsError(try Comparison(of: nil, .equalTo(now)).allowsNil(false).validate())
     }
 
+    @MainActor
     func testGreaterThanWithCollection() throws {
         XCTAssertNoThrow(try Comparison(of: [5, 10, 0], .greaterThan([5, 9, 2])).validate())
         XCTAssertThrowsError(try Comparison(of: [5, 10, 0], .greaterThan([5, 10, 0])).validate())
@@ -85,6 +86,7 @@ final class ComparisonTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testGreaterThanOrEqualWithCollection() throws {
         XCTAssertNoThrow(try Comparison(of: [5, 10, 0], .greaterThanOrEqualTo([5, 9, 2])).validate())
         XCTAssertNoThrow(try Comparison(of: [5, 10, 0], .greaterThanOrEqualTo([5, 10, 0])).validate())
@@ -108,6 +110,7 @@ final class ComparisonTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testLessThanWithCollection() throws {
         XCTAssertThrowsError(try Comparison(of: [5, 10, 0], .lessThan([5, 9, 2])).validate())
         XCTAssertThrowsError(try Comparison(of: [5, 10, 0], .lessThan([5, 10, 0])).validate())
@@ -131,6 +134,7 @@ final class ComparisonTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testLessThanOrEqualWithCollection() throws {
         XCTAssertThrowsError(try Comparison(of: [5, 10, 0], .lessThanOrEqualTo([5, 9, 2])).validate())
         XCTAssertNoThrow(try Comparison(of: [5, 10, 0], .lessThanOrEqualTo([5, 10, 0])).validate())
@@ -154,6 +158,7 @@ final class ComparisonTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testOtherThanWithCollection() throws {
         XCTAssertNoThrow(try Comparison(of: [5, 10, 0], .otherThan([5, 9, 2])).validate())
         XCTAssertThrowsError(try Comparison(of: [5, 10, 0], .otherThan([5, 10, 0])).validate())
@@ -177,6 +182,7 @@ final class ComparisonTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testEqualityWithCollection() throws {
         XCTAssertThrowsError(try Comparison(of: [5, 10, 0], .equalTo([5, 9, 2])).validate())
         XCTAssertNoThrow(try Comparison(of: [5, 10, 0], .equalTo([5, 10, 0])).validate())

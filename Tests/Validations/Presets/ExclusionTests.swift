@@ -6,6 +6,7 @@ final class ExclusionTests: XCTestCase {
         case a, b, c
     }
 
+    @MainActor
     func testSingleValue() throws {
         XCTAssertThrowsError(try Exclusion(of: Test.a, in: [.a, .c]).validate())
         XCTAssertNoThrow(try Exclusion(of: Test.a, in: [.b, .c]).validate())
@@ -16,6 +17,7 @@ final class ExclusionTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testMultipleValues() throws {
         XCTAssertThrowsError(try Exclusion(of: [Test.a, .b], in: [.a, .b, .c]).validate())
         XCTAssertNoThrow(try Exclusion(of: [Test.a, .b], in: [.a, .c]).validate())
@@ -33,6 +35,7 @@ final class ExclusionTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testString() throws {
         XCTAssertThrowsError(try Exclusion(of: "S", in: "Swift").validate())
         XCTAssertNoThrow(try Exclusion(of: "s", in: "Swift").validate())
@@ -53,6 +56,7 @@ final class ExclusionTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testSingleValueInRange() throws {
         XCTAssertThrowsError(try Exclusion(of: 5, in: 4...).validate())
         XCTAssertNoThrow(try Exclusion(of: 5, in: ...4).validate())
@@ -63,6 +67,7 @@ final class ExclusionTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testMultipleValueInRange() throws {
         XCTAssertThrowsError(try Exclusion(of: [2, 5], in: 2...).validate())
         XCTAssertNoThrow(try Exclusion(of: [2, 5], in: 3...).validate())

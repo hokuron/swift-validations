@@ -2,6 +2,7 @@ import XCTest
 @testable import Validations
 
 final class CountTests: XCTestCase {
+    @MainActor
     func testBoundary() throws {
         let value = "12345"
         try XCTContext.runActivity(named: "lower") { _ in
@@ -20,6 +21,7 @@ final class CountTests: XCTestCase {
         }
     }
 
+    @MainActor
     func testNil() throws {
         try XCTContext.runActivity(named: "disallowed") { _ in
             XCTAssertThrowsError(try Count(of: String?.none, within: 0...).validate())

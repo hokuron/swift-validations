@@ -7,17 +7,10 @@ public struct ValidationError: Error, Hashable, @unchecked Sendable {
         self.reasons = reasons
     }
 
-    #if DEBUG && swift(>=6.0) // https://github.com/apple/swift/issues/57560
-    @usableFromInline
-    mutating func setKey<R, V>(_ keyPath: KeyPath<R, V>) {
-        self.key = keyPath
-    }
-    #else
     @usableFromInline
     mutating func setKey<T: Hashable & Sendable>(_ key: T) {
         self.key = key
     }
-    #endif
 }
 
 extension ValidationError {

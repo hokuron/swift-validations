@@ -21,11 +21,7 @@ final class ValidatorErrorKeyTests: XCTestCase {
             }
         }
 
-        #if swift(>=6.0)
-        XCTAssertEqual(SUT().validationError?.key, \SUT.name)
-        #else
-        XCTAssertEqual(SUT().validationErrors?.first?.key, (\SUT.name).hashValue)
-        #endif
+        XCTAssertEqual(SUT().validationErrors?.first?.key, \SUT.name)
     }
 
     func testWithValidatorBuilder() {
