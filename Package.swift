@@ -22,11 +22,13 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Validations"
+            name: "Validations",
+            swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
         ),
         .testTarget(
             name: "ValidationsTests",
-            dependencies: ["Validations"]
+            dependencies: ["Validations"],
+            swiftSettings: [.enableUpcomingFeature("ExistentialAny")]
         ),
     ]
 )
