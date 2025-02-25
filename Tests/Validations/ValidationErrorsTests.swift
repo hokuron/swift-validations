@@ -1,8 +1,10 @@
-import XCTest
+import Testing
 @testable import Validations
 
-final class ValidationErrorsTests: XCTestCase {
-    func testReasonsForKey() {
+@Suite
+struct ValidationErrorsTests {
+    @Test
+    func reasonsForKey() {
         var error1 = ValidationError(reasons: [.count, .empty])
         error1.setKey("error group 1")
         var error2 = ValidationError(reasons: .format)
@@ -15,12 +17,13 @@ final class ValidationErrorsTests: XCTestCase {
         error5.setKey("error group 3")
 
         let sut = ValidationErrors([error1, error2, error3, error4, error5])
-        XCTAssertEqual(sut.reasons(for: "error group 1"), [.count, .empty, .format])
-        XCTAssertEqual(sut.reasons(for: "error group 2"), .empty)
-        XCTAssertEqual(sut.reasons(for: "error group 3"), [.greaterThan, .nil])
+        #expect(sut.reasons(for: "error group 1") == [.count, .empty, .format])
+        #expect(sut.reasons(for: "error group 2") == .empty)
+        #expect(sut.reasons(for: "error group 3") == [.greaterThan, .nil])
     }
 
-    func testReasonsForKeyPath() {
+    @Test
+    func reasonsForKeyPath() {
         struct Test: Validator {
             var name = ""
 
@@ -32,6 +35,6 @@ final class ValidationErrorsTests: XCTestCase {
             }
         }
 
-        XCTAssertEqual(Test().validationErrors?.reasons(for: \Test.name), [.count, .inclusion])
+        #expect(Test().validationErrors?.reasons(for: \Test.name) == [.count, .inclusion])
     }
 }

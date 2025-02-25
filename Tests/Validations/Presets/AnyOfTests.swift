@@ -1,68 +1,74 @@
-import XCTest
+import Testing
 @testable import Validations
 
-final class AnyOfTests: XCTestCase {
-    func testSuccess() {
-        XCTAssertNoThrow(
+@Suite
+struct AnyOfTests {
+    @Test
+    func success() {
+        #expect(throws: Never.self) {
             try AnyOf(["123", "456789"]) {
                 Presence(of: $0)
                 Count(of: $0, within: 3...)
             }
             .validate()
-        )
-        XCTAssertNoThrow(
+        }
+        #expect(throws: Never.self) {
             try AnyOf(["", "456789"]) {
                 Presence(of: $0)
                 Count(of: $0, within: 3...)
             }
             .validate()
-        )
-        XCTAssertNoThrow(
+        }
+        #expect(throws: Never.self) {
             try AnyOf(["123", ""]) {
                 Presence(of: $0)
                 Count(of: $0, within: 3...)
             }
             .validate()
-        )
-    }    
+        }
+    }
 
-    func testFailure() {
-        XCTAssertThrowsError(
+    @Test
+    func failure() {
+        #expect(throws: ValidationErrors.self) {
             try AnyOf(["123", "456789"]) {
                 Presence(of: $0)
                 Count(of: $0, exact: 2)
             }
             .validate()
-        )
-        XCTAssertThrowsError(
+        }
+        #expect(throws: ValidationErrors.self) {
             try AnyOf(["", "456789"]) {
                 Presence(of: $0)
                 Count(of: $0, exact: 2)
             }
             .validate()
-        )
-        XCTAssertThrowsError(
+        }
+        #expect(throws: ValidationErrors.self) {
             try AnyOf(["123", ""]) {
                 Presence(of: $0)
                 Count(of: $0, exact: 2)
             }
             .validate()
-        )
+        }
     }
 
-    func testEmptyValues() {
-        XCTAssertNoThrow(try AnyOf([String](), pass: Presence.init).validate())
+    @Test
+    func emptyValues() {
+        #expect(throws: Never.self) { try AnyOf([String](), pass: Presence.init).validate() }
     }
 
-    func testInitWithValidatorValues() {
+    @Test
+    func initWithValidatorValues() {
         struct Value: Validator {
             var validation: some Validator { Presence(of: "") }
         }
 
-        XCTAssertThrowsError(try AnyOf([Value(), Value()]).validate())
+        #expect(throws: ValidationErrors.self) { try AnyOf([Value(), Value()]).validate() }
     }
 
-    func testInitWithKeyPath() {
+    @Test
+    func initWithKeyPath() {
         struct Value {
             var inner: Inner
 
@@ -72,10 +78,11 @@ final class AnyOfTests: XCTestCase {
             }
         }
 
-        XCTAssertNoThrow(try AnyOf([Value(inner: .init(value: "")), Value(inner: .init(value: "A"))], pass: \.inner).validate())
+        #expect(throws: Never.self) { try AnyOf([Value(inner: .init(value: "")), Value(inner: .init(value: "A"))], pass: \.inner).validate() }
     }
 
-    func testOuterErrorKey() {
+    @Test
+    func outerErrorKey() {
         let errorKey = "ErrorKey"
         let sut = AnyOf(["", ""]) {
             Presence(of: $0)
@@ -83,11 +90,12 @@ final class AnyOfTests: XCTestCase {
         }
         .errorKey(errorKey)
 
-        XCTAssertEqual(sut.validationErrors?.errors, sut.validationErrors?[errorKey])
-        XCTAssertEqual(sut.validationErrors?.reasons(for: errorKey), [.empty, .count, .empty, .count])
+        #expect(sut.validationErrors?.errors == sut.validationErrors?[errorKey])
+        #expect(sut.validationErrors?.reasons(for: errorKey) == [.empty, .count, .empty, .count])
     }
 
-    func testInnerErrorKey() {
+    @Test
+    func innerErrorKey() {
         let errorKey1 = "ErrorKey1"
         let errorKey2 = "ErrorKey2"
         let sut = AnyOf(["", ""]) {
@@ -97,17 +105,18 @@ final class AnyOfTests: XCTestCase {
                 .errorKey(errorKey2)
         }
 
-        XCTAssertEqual(sut.validationErrors?.count, 4)
-        XCTAssertEqual(sut.validationErrors?.errors.map(\.reasons), [.empty, .count, .empty, .count])
+        #expect(sut.validationErrors?.count == 4)
+        #expect(sut.validationErrors?.errors.map(\.reasons) == [.empty, .count, .empty, .count])
 
-        XCTAssertEqual(sut.validationErrors?[errorKey1].count, 2)
-        XCTAssertEqual(sut.validationErrors?.reasons(for: errorKey1), [.empty])
+        #expect(sut.validationErrors?[errorKey1].count == 2)
+        #expect(sut.validationErrors?.reasons(for: errorKey1) == [.empty])
 
-        XCTAssertEqual(sut.validationErrors?[errorKey2].count, 2)
-        XCTAssertEqual(sut.validationErrors?.reasons(for: errorKey2), [.count])
+        #expect(sut.validationErrors?[errorKey2].count == 2)
+        #expect(sut.validationErrors?.reasons(for: errorKey2) == [.count])
     }
 
-    func testOuterAndInnerErrorKey() {
+    @Test
+    func outerAndInnerErrorKey() {
         let outerErrorKey = "OuterErrorKey"
         let innerErrorKey1 = "InnerErrorKey1"
         let innerErrorKey2 = "InnerErrorKey2"
@@ -120,12 +129,12 @@ final class AnyOfTests: XCTestCase {
         .errorKey(outerErrorKey)
 
         // The appropriateness of this behavior is open to discussion.
-        XCTAssertEqual(sut.validationErrors?[outerErrorKey].count, 0)
+        #expect(sut.validationErrors?[outerErrorKey].count == 0)
 
-        XCTAssertEqual(sut.validationErrors?[innerErrorKey1].count, 2)
-        XCTAssertEqual(sut.validationErrors?.reasons(for: innerErrorKey1), [.empty])
+        #expect(sut.validationErrors?[innerErrorKey1].count == 2)
+        #expect(sut.validationErrors?.reasons(for: innerErrorKey1) == [.empty])
 
-        XCTAssertEqual(sut.validationErrors?[innerErrorKey2].count, 2)
-        XCTAssertEqual(sut.validationErrors?.reasons(for: innerErrorKey2), [.count])
+        #expect(sut.validationErrors?[innerErrorKey2].count == 2)
+        #expect(sut.validationErrors?.reasons(for: innerErrorKey2) == [.count])
     }
 }

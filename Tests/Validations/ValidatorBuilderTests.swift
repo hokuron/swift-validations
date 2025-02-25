@@ -1,16 +1,18 @@
-import XCTest
+import Testing
 import SwiftUI
 @testable import Validations
 
-final class ValidatorBuilderTests: XCTestCase {
-    func testMergeValidations() {
+@Suite
+struct ValidatorBuilderTests {
+    @Test
+    func mergeValidations() {
         struct SUT: Validator {
             var name: String?
             var email: String?
             var confirmedEmail: String?
             var age: String?
             var agreed: Bool
-
+            
             var validation: some Validator {
                 Presence(of: name)
                 Presence(of: email)
@@ -19,28 +21,27 @@ final class ValidatorBuilderTests: XCTestCase {
                 } else {
                     Inclusion(of: agreed, in: [false])
                 }
-
+                
                 Inclusion(of: agreed, in: [true])
-
+                
                 for str in [name, email] {
                     Count(of: str, within: 1...)
                 }
             }
         }
-
-        XCTAssertNoThrow(try SUT(name: "A B", email: "mail@example.com", agreed: true).validate())
-        XCTAssertEqual(SUT(name: "", email: "mail@example.com", agreed: false).validationErrors?.reasons, [.empty, .inclusion, .count])
+        #expect(throws: Never.self) { try SUT(name: "A B", email: "mail@example.com", agreed: true).validate() }
+        #expect(SUT(name: "", email: "mail@example.com", agreed: false).validationErrors?.reasons == [.empty, .inclusion, .count])
     }
-
+    
     // MARK: - Compile time tests.
-
+    
     enum Test {
         struct Empty: Validator {
             var validation: some Validator {
                 Validate {}
             }
         }
-
+        
         @available(iOS, introduced: 9999)
         @available(macOS, introduced: 9999)
         @available(tvOS, introduced: 9999)
@@ -52,18 +53,19 @@ final class ValidatorBuilderTests: XCTestCase {
             }
         }
     }
-
-    func testSingleBlock() {
+    
+    @Test
+    func singleBlock() {
         struct SUT: Validator {
             var validation: some Validator {
                 Test.Empty()
             }
         }
-
-        XCTAssertNoThrow(try SUT().validate())
+        #expect(throws: Never.self) { try SUT().validate() }
     }
-
-    func testLimitedAvailability() {
+    
+    @Test
+    func limitedAvailability() {
         struct SUT: Validator {
             var validation: some Validator {
                 Test.Empty()
@@ -75,11 +77,11 @@ final class ValidatorBuilderTests: XCTestCase {
                 Test.Empty()
             }
         }
-
-        XCTAssertNoThrow(try SUT().validate())
+        #expect(throws: Never.self) { try SUT().validate() }
     }
-
-    func testEither() {
+    
+    @Test
+    func either() {
         struct SUT: Validator {
             var validation: some Validator {
                 if Bool.random() {
@@ -89,11 +91,11 @@ final class ValidatorBuilderTests: XCTestCase {
                 }
             }
         }
-
-        XCTAssertNoThrow(try SUT().validate())
+        #expect(throws: Never.self) { try SUT().validate() }
     }
-
-    func testOptional() {
+    
+    @Test
+    func optional() {
         struct SUT: Validator {
             var validation: some Validator {
                 if Bool.random() {
@@ -101,11 +103,11 @@ final class ValidatorBuilderTests: XCTestCase {
                 }
             }
         }
-
-        XCTAssertNoThrow(try SUT().validate())
+        #expect(throws: Never.self) { try SUT().validate() }
     }
-
-    func testArray() {
+    
+    @Test
+    func array() {
         struct SUT: Validator {
             var validation: some Validator {
                 for n in [1, 2, 3] {
@@ -113,7 +115,6 @@ final class ValidatorBuilderTests: XCTestCase {
                 }
             }
         }
-
-        XCTAssertNoThrow(try SUT().validate())
+        #expect(throws: Never.self) { try SUT().validate() }
     }
 }
