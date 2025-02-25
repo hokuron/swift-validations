@@ -17,6 +17,9 @@ let package = Package(
             name: "Validations",
             targets: ["Validations"]),
     ],
+    dependencies: [
+        .package(url: "https://github.com/giginet/swift-testing-revolutionary", from: "0.1.0"),
+    ],
     targets: [
         .target(
             name: "Validations"

@@ -1,17 +1,19 @@
-import XCTest
+import Testing
 @testable import Validations
 
-final class ValidatorErrorKeyTests: XCTestCase {
-    func testString() {
+@Suite
+struct ValidatorErrorKeyTests {
+    @Test func string() {
         let sut = Validate {
             throw ValidationError(reasons: .format)
         }
-        .errorKey("Error Key")
+            .errorKey("Error Key")
 
-        XCTAssertEqual(sut.validationErrors?.first?.key, "Error Key")
+        #expect(sut.validationErrors?.first?.key == AnyHashable("Error Key"))
     }
 
-    func testKeyPath() {
+    @Test
+    func keyPath() {
         struct SUT: Validator {
             var name: String?
 
@@ -21,10 +23,11 @@ final class ValidatorErrorKeyTests: XCTestCase {
             }
         }
 
-        XCTAssertEqual(SUT().validationErrors?.first?.key, \SUT.name)
+        #expect(SUT().validationErrors?.first?.key == AnyHashable(\SUT.name))
     }
 
-    func testWithValidatorBuilder() {
+    @Test
+    func withValidatorBuilder() {
         struct SUT: Validator {
             var name: String?
             var age = 10
@@ -43,10 +46,11 @@ final class ValidatorErrorKeyTests: XCTestCase {
             }
         }
 
-        XCTAssertEqual(SUT().validationErrors?.map(\.key), ["presence", "count", "comparison"])
+        #expect(SUT().validationErrors?.map(\.key) == ["presence", "count", "comparison"])
     }
 
-    func testOverwriteKeys() {
+    @Test
+    func overwriteKeys() {
         struct SUT: Validator {
             var child = Child()
 
@@ -70,10 +74,9 @@ final class ValidatorErrorKeyTests: XCTestCase {
             }
         }
 
-        XCTAssertEqual(
-            SUT().validationErrors?.map(\.key),
-            ["parent presence", "child presence", "overwritten key", "overwritten key", nil, "parent absence"]
+        #expect(
+            SUT().validationErrors?.map(\.key) == ["parent presence", "child presence", "overwritten key", "overwritten key", nil, "parent absence"]
         )
-        XCTAssertEqual(SUT().validationErrors?.reasons(for: "overwritten key"), [.count, .present])
+        #expect(SUT().validationErrors?.reasons(for: "overwritten key") == [.count, .present])
     }
 }

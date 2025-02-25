@@ -1,15 +1,18 @@
-import XCTest
+import Testing
 import RegexBuilder
 @testable import Validations
 
-final class FormatTests: XCTestCase {
-    func testWithPattern() {
-        XCTAssertNoThrow(try Format(of: "aBc", with: #/\A[a-zA-Z]+\z/#).validate())
-        XCTAssertThrowsError(try Format(of: "aBc123", with: #/\A[a-zA-Z]+\z/#).validate())
+@Suite
+struct FormatTests {
+    @Test
+    func withPattern() {
+        #expect(throws: Never.self) { try Format(of: "aBc", with: /\A[a-zA-Z]+\z/).validate() }
+        #expect(throws: ValidationError.self) { try Format(of: "aBc123", with: /\A[a-zA-Z]+\z/).validate() }
     }
 
-    func testWithBuilder() {
-        XCTAssertNoThrow(
+    @Test
+    func withBuilder() {
+        #expect(throws: Never.self) {
             try Format(of: "aBc") {
                 Anchor.startOfSubject
                 OneOrMore {
@@ -20,10 +23,8 @@ final class FormatTests: XCTestCase {
                 }
                 Anchor.endOfSubject
             }
-            .validate()
-        )
-
-        XCTAssertThrowsError(
+            .validate() }
+        #expect(throws: ValidationError.self) {
             try Format(of: "aBc123") {
                 Anchor.startOfSubject
                 OneOrMore {
@@ -34,19 +35,20 @@ final class FormatTests: XCTestCase {
                 }
                 Anchor.endOfSubject
             }
-            .validate()
-        )
+            .validate() }
     }
 
-    func testNilValue() {
-        XCTAssertThrowsError(try Format(of: nil, with: #/\A[a-zA-Z]+\z/#).validate())
-        XCTAssertNoThrow(try Format(of: nil, with: #/\A[a-zA-Z]+\z/#).allowsNil().validate())
-        XCTAssertNoThrow(try Format(of: nil, with: #/\A[a-zA-Z]+\z/#).allowsNil().allowsEmpty().validate())
+    @Test
+    func nilValue() {
+        #expect(throws: ValidationError.self) { try Format(of: nil, with: /\A[a-zA-Z]+\z/).validate() }
+        #expect(throws: Never.self) { try Format(of: nil, with: /\A[a-zA-Z]+\z/).allowsNil().validate() }
+        #expect(throws: Never.self) { try Format(of: nil, with: /\A[a-zA-Z]+\z/).allowsNil().allowsEmpty().validate() }
     }
 
-    func testEmptyValue() {
-        XCTAssertThrowsError(try Format(of: "", with: #/\A[a-zA-Z]+\z/#).validate())
-        XCTAssertNoThrow(try Format(of: "", with: #/\A[a-zA-Z]+\z/#).allowsEmpty().validate())
-        XCTAssertNoThrow(try Format(of: "", with: #/\A[a-zA-Z]+\z/#).allowsEmpty().allowsNil().validate())
+    @Test
+    func emptyValue() {
+        #expect(throws: ValidationError.self) { try Format(of: "", with: /\A[a-zA-Z]+\z/).validate() }
+        #expect(throws: Never.self) { try Format(of: "", with: /\A[a-zA-Z]+\z/).allowsEmpty().validate() }
+        #expect(throws: Never.self) { try Format(of: "", with: /\A[a-zA-Z]+\z/).allowsEmpty().allowsNil().validate() }
     }
 }
