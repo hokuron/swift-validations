@@ -89,12 +89,44 @@ public struct Comparison<Value: Comparable>: Validator, PresenceValidatable {
     }
 
     @inlinable
+    public init<E: Equatable>(of value: E?, equalTo suppliedValue: E) where Value == _EqualityOnlyComparable<E> {
+        self.value = value.map(_EqualityOnlyComparable.init)
+        self.operator = .equalTo(_EqualityOnlyComparable(suppliedValue))
+    }
+
+    @inlinable
     public func validate() throws {
         guard let presenceValue = try validatePresence(resolvingErrorWithReasons: `operator`.errorReasons) else {
             return
         }
 
         try `operator`.perform(with: presenceValue)
+    }
+}
+
+public struct _EqualityOnlyComparable<Base: Equatable>: Comparable {
+    @usableFromInline
+    var base: Base
+
+    @usableFromInline
+    init(_ base: Base) {
+        self.base = base
+    }
+
+    @inlinable
+    @inline(__always)
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.base == rhs.base
+    }
+
+    @inlinable
+    @inline(__always)
+    public static func != (lhs: Self, rhs: Self) -> Bool {
+        lhs.base != rhs.base
+    }
+
+    public static func < (lhs: Self, rhs: Self) -> Bool {
+        preconditionFailure()
     }
 }
 

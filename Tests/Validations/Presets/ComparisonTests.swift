@@ -219,4 +219,16 @@ struct ComparisonTests {
             #expect(throws: Never.self) { try Comparison(of: [], .equalTo([5, 10, 0])).allowsEmpty().validate() }
         }
     }
+
+    @Test
+    func equatable() throws {
+        #expect(throws: Never.self) { try Comparison(of: false, equalTo: false).validate() }
+        #expect(throws: ValidationError.self) { try Comparison(of: true, equalTo: false).validate() }
+
+        #expect(throws: ValidationError.self) { try Comparison(of: nil, equalTo: true).validate() }
+        #expect(throws: Never.self) { try Comparison(of: nil, equalTo: true).allowsNil().validate() }
+        #expect(throws: ValidationError.self) { try Comparison(of: nil, equalTo: true).allowsNil(false).validate() }
+
+        #expect(throws: Never.self) { try Comparison(of: Optional(true), equalTo: true).validate() }
+    }
 }
