@@ -30,7 +30,7 @@ public struct ValidationErrors: Error, Hashable, Sendable {
 
     @inlinable
     public subscript<R, V>(_ keyPath: KeyPath<R, V>) -> [ValidationError] {
-        #if DEBUG && swift(>=6.0) // https://github.com/apple/swift/issues/57560
+        #if swift(>=6.0)
         errors.filter { $0.key == AnyHashable(keyPath) }
         #else
         errors.filter { $0.key == AnyHashable(keyPath.hashValue) }
