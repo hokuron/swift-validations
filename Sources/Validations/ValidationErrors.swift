@@ -19,7 +19,7 @@ public struct ValidationErrors: Error, Hashable, Sendable {
     }
 
     @inlinable
-    public func reasons<R, V>(for keyPath: KeyPath<R, V>) -> ValidationError.Reasons {
+    public func reasons<Root>(for keyPath: PartialKeyPath<Root>) -> ValidationError.Reasons {
         self[keyPath].reduce([]) { $0.union($1.reasons) }
     }
 
@@ -29,7 +29,7 @@ public struct ValidationErrors: Error, Hashable, Sendable {
     }
 
     @inlinable
-    public subscript<R, V>(_ keyPath: KeyPath<R, V>) -> [ValidationError] {
+    public subscript<Root>(_ keyPath: PartialKeyPath<Root>) -> [ValidationError] {
         #if swift(>=6.0)
         errors.filter { $0.key == AnyHashable(keyPath) }
         #else
