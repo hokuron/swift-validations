@@ -1,11 +1,10 @@
-public struct Count<Value: Collection, Range: RangeExpression<Int>>: Validator {
+public struct Count<Value: Collection, Range: RangeExpression<Int>>: Validator, PresenceValidatable {
     public var value: Value?
 
     @usableFromInline
     var range: Range
 
-    @usableFromInline
-    var allowsNil = false
+    public var presenceOption: PresenceOption = .required(allowsEmpty: true)
 
     @inlinable
     public init(of value: Value?, within range: Range) {
@@ -21,23 +20,13 @@ public struct Count<Value: Collection, Range: RangeExpression<Int>>: Validator {
 
     @inlinable
     public func validate() throws {
-        guard let value else {
-            if !allowsNil {
-                throw ValidationError(reasons: .count)
-            }
+        guard let presenceValue = try validatePresence(resolvingErrorWithReasons: .count) else {
             return
         }
 
-        if !range.contains(value.count) {
+        if !range.contains(presenceValue.count) {
             throw ValidationError(reasons: .count)
         }
-    }
-
-    @inlinable
-    func allowsNil(_ enabled: Bool = true) -> Self {
-        var `self` = self
-        self.allowsNil = enabled
-        return self
     }
 }
 

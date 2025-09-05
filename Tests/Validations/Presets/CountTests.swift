@@ -47,16 +47,30 @@ struct CountTests {
     }
 
     @Test
-    func empty() {
-        #expect(throws: Never.self) { try Count(of: "", within: 0...).validate() }
-        #expect(throws: Never.self) { try Count(of: "", exact: 0).validate() }
-        #expect(throws: Never.self) { try Count(of: [Int](), within: 0...).validate() }
-        #expect(throws: Never.self) { try Count(of: [Int](), exact: 0).validate() }
-        #expect(throws: Never.self) { try Count(of: [Int?](), within: 0...).validate() }
-        #expect(throws: Never.self) { try Count(of: [Int?](), exact: 0).validate() }
-        #expect(throws: Never.self) { try Count(of: [Int]?([]), within: 0...).validate() }
-        #expect(throws: Never.self) { try Count(of: [Int]?([]), exact: 0).validate() }
-        #expect(throws: Never.self) { try Count(of: [Int?]?([]), within: 0...).validate() }
-        #expect(throws: Never.self) { try Count(of: [Int?]?([]), exact: 0).validate() }
+    func empty_allowed() {
+        #expect(throws: Never.self) { try Count(of: "", within: 3...).validate() }
+        #expect(throws: Never.self) { try Count(of: "", exact: 3).validate() }
+        #expect(throws: Never.self) { try Count(of: [Int](), within: 3...).validate() }
+        #expect(throws: Never.self) { try Count(of: [Int](), exact: 3).validate() }
+        #expect(throws: Never.self) { try Count(of: [Int?](), within: 3...).validate() }
+        #expect(throws: Never.self) { try Count(of: [Int?](), exact: 3).validate() }
+        #expect(throws: Never.self) { try Count(of: [Int]?([]), within: 3...).validate() }
+        #expect(throws: Never.self) { try Count(of: [Int]?([]), exact: 3).validate() }
+        #expect(throws: Never.self) { try Count(of: [Int?]?([]), within: 3...).validate() }
+        #expect(throws: Never.self) { try Count(of: [Int?]?([]), exact: 3).validate() }
+    }
+
+    @Test
+    func empty_disallowed() {
+        #expect(throws: ValidationError.self) { try Count(of: "", within: 0...).allowsEmpty(false).validate() }
+        #expect(throws: ValidationError.self) { try Count(of: "", exact: 0).allowsEmpty(false).validate() }
+        #expect(throws: ValidationError.self) { try Count(of: [Int](), within: 0...).allowsEmpty(false).validate() }
+        #expect(throws: ValidationError.self) { try Count(of: [Int](), exact: 0).allowsEmpty(false).validate() }
+        #expect(throws: ValidationError.self) { try Count(of: [Int?](), within: 0...).allowsEmpty(false).validate() }
+        #expect(throws: ValidationError.self) { try Count(of: [Int?](), exact: 0).allowsEmpty(false).validate() }
+        #expect(throws: ValidationError.self) { try Count(of: [Int]?([]), within: 0...).allowsEmpty(false).validate() }
+        #expect(throws: ValidationError.self) { try Count(of: [Int]?([]), exact: 0).allowsEmpty(false).validate() }
+        #expect(throws: ValidationError.self) { try Count(of: [Int?]?([]), within: 0...).allowsEmpty(false).validate() }
+        #expect(throws: ValidationError.self) { try Count(of: [Int?]?([]), exact: 0).allowsEmpty(false).validate() }
     }
 }
