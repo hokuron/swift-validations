@@ -196,14 +196,14 @@ These validators check for inclusion or exclusion within a set of values.
 
 ```swift
 Inclusion(of: articleStatus, in: [.published, .secret])
-Exclusion(of: permission, in: [.reader, .editor])
+Exclusion(of: permission, from: [.reader, .editor])
 ```
 
 They also support range validations.
 
 ```swift
 Inclusion(of: age, in: 16...)
-Exclusion(of: age, in: ..<16)
+Exclusion(of: age, from: ..<16)
 ```
 
 ### `Count`
@@ -214,6 +214,31 @@ This validator checks if the count of a collection, including `String`, falls wi
 Count(of: interests, within: 3...)
 Count(of: username, within: 1..<20)
 Count(of: productCode, exact: 8)
+```
+
+### `AnyOf`
+
+This validator checks if any of the values provided in the first argument pass the validation specified in the second argument.
+
+```swift
+import RegexBuilder
+AnyOf([email1, email2, email3]) {
+    Format(of: $0) {
+        ZeroOrMore {
+            OneOrMore(.word)
+            "."
+        }
+        OneOrMore(.word)
+        "@"
+        OneOrMore(.word)
+        OneOrMore {
+            "."
+            OneOrMore(.word)
+        }
+    }
+}
+
+AnyOf([givenName, middleName, familyName], pass: Presence.init)
 ```
 
 ### `Validate`
@@ -294,31 +319,6 @@ Validate {
     Count(bio, within: 0...1000)
 }
 .errorKey("Profile")
-```
-
-### `AnyOf`
-
-This validator checks if any of the values provided in the first argument pass the validation specified in the second argument.
-
-```swift
-import RegexBuilder
-AnyOf([email1, email2, email3]) {
-    Format(of: $0) {
-        ZeroOrMore {
-            OneOrMore(.word)
-            "."
-        }
-        OneOrMore(.word)
-        "@"
-        OneOrMore(.word)
-        OneOrMore {
-            "."
-            OneOrMore(.word)
-        }
-    }
-}
-
-AnyOf([givenName, middleName, familyName], pass: Presence.init)
 ```
 
 ### `ValidationErrors`
