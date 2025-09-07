@@ -65,11 +65,15 @@ struct ExclusionTests {
     @MainActor
     func singleValueInRange() throws {
         #expect(throws: ValidationError.self) { try Exclusion(of: 5, in: 4...).validate() }
+        #expect(throws: ValidationError.self) { try Exclusion(of: 5, in: 4...5).validate() }
         #expect(throws: Never.self) { try Exclusion(of: 5, in: ...4).validate() }
+        #expect(throws: Never.self) { try Exclusion(of: 5, in: 0..<5).validate() }
 
         XCTContext.runActivity(named: "nil value") { _ in
             #expect(throws: ValidationError.self) { try Exclusion(of: nil, in: ...4).validate() }
+            #expect(throws: ValidationError.self) { try Exclusion(of: nil, in: 0...4).validate() }
             #expect(throws: Never.self) { try Exclusion(of: nil, in: ...4).allowsNil().validate() }
+            #expect(throws: Never.self) { try Exclusion(of: nil, in: 0..<5).allowsNil().validate() }
         }
     }
 
@@ -77,19 +81,26 @@ struct ExclusionTests {
     @MainActor
     func multipleValueInRange() throws {
         #expect(throws: ValidationError.self) { try Exclusion(of: [2, 5], in: 2...).validate() }
+        #expect(throws: ValidationError.self) { try Exclusion(of: [2, 5], in: 2...5).validate() }
         #expect(throws: Never.self) { try Exclusion(of: [2, 5], in: 3...).validate() }
-        #expect(throws: Never.self) { try Exclusion(of: [2, 5], in: 3...).validate() }
+        #expect(throws: Never.self) { try Exclusion(of: [2, 5], in: 2..<5).validate() }
 
         XCTContext.runActivity(named: "nil value") { _ in
             #expect(throws: ValidationError.self) { try Exclusion(of: [Int]?.none, in: 0...).validate() }
-            #expect(throws: Never.self) { try Exclusion(of: [Int]?.none, in: 0...).allowsNil().validate() }
-            #expect(throws: Never.self) { try Exclusion(of: [Int]?.none, in: 0...).allowsNil().allowsEmpty().validate() }
+            #expect(throws: ValidationError.self) { try Exclusion(of: [Int]?.none, in: 0...10).validate() }
+            #expect(throws: Never.self) { try Exclusion(of: [Int]?.none, in: ..<10).allowsNil().validate() }
+            #expect(throws: Never.self) { try Exclusion(of: [Int]?.none, in: 0..<10).allowsNil().validate() }
+            #expect(throws: Never.self) { try Exclusion(of: [Int]?.none, in: ...4).allowsNil().allowsEmpty().validate() }
+            #expect(throws: Never.self) { try Exclusion(of: [Int]?.none, in: 0...4).allowsNil().allowsEmpty().validate() }
         }
 
         XCTContext.runActivity(named: "empty value") { _ in
             #expect(throws: ValidationError.self) { try Exclusion(of: [], in: 0...).validate() }
+            #expect(throws: ValidationError.self) { try Exclusion(of: [], in: 0...10).validate() }
             #expect(throws: Never.self) { try Exclusion(of: [], in: 0...).allowsEmpty().validate() }
+            #expect(throws: Never.self) { try Exclusion(of: [], in: 0...10).allowsEmpty().validate() }
             #expect(throws: Never.self) { try Exclusion(of: [], in: 0...).allowsEmpty().allowsNil().validate() }
+            #expect(throws: Never.self) { try Exclusion(of: [], in: 0..<11).allowsEmpty().allowsNil().validate() }
         }
     }
 }

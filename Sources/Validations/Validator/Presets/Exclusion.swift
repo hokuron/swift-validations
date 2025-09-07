@@ -7,6 +7,7 @@ public struct Exclusion<Value, Member: _Clusivity.Member>: Validator, PresenceVa
     public var presenceOption: PresenceOption = .required
 
     @inlinable
+    @_disfavoredOverload
     public init<M: Collection<Value>>(of value: Value?, in member: M)
     where Member == _Clusivity.CollectionMember<M> {
         self.value = value
@@ -14,12 +15,12 @@ public struct Exclusion<Value, Member: _Clusivity.Member>: Validator, PresenceVa
     }
 
     @inlinable
+    @_disfavoredOverload
     public init<M: Collection<Value.Element>>(of value: Value?, in member: M)
     where Value: Collection, Member == _Clusivity.CollectionMember<M> {
         self.value = value
         self.member = _Clusivity.CollectionMember(base: member)
     }
-
 
     @inlinable
     public init<R: RangeExpression<Value>>(of element: Value?, in range: R)
