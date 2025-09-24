@@ -9,13 +9,13 @@ public struct Format: Validator, PresenceValidatable {
     public var presenceOption: PresenceOption = .required
 
     @inlinable
-    public init<O>(of value: String?, with regex: Regex<O>) {
-        self.value = value
+    public init<O>(of value: (some StringProtocol)?, with regex: Regex<O>) {
+        self.value = value.map(String.init(_:))
         self.regex = Regex(regex)
     }
 
     @inlinable
-    public init<O>(of value: String?, @RegexComponentBuilder _ builder: () -> some RegexComponent<O>) {
+    public init<O>(of value: (some StringProtocol)?, @RegexComponentBuilder _ builder: () -> some RegexComponent<O>) {
         self.init(of: value, with: Regex(builder))
     }
 
