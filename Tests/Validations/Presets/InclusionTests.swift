@@ -65,11 +65,14 @@ struct InclusionTests {
     @MainActor
     func singleValueInRange() throws {
         #expect(throws: Never.self) { try Inclusion(of: 5, in: 4...).validate() }
-        #expect(throws: ValidationError.self) { try Inclusion(of: 5, in: ...4).validate() }
+        #expect(throws: Never.self) { try Inclusion(of: 5, in: 4...5).validate() }
+        #expect(throws: ValidationError.self) { try Inclusion(of: 5, in: 2...4).validate() }
 
         XCTContext.runActivity(named: "nil value") { _ in
             #expect(throws: ValidationError.self) { try Inclusion(of: nil, in: ...4).validate() }
+            #expect(throws: ValidationError.self) { try Inclusion(of: nil, in: 2...4).validate() }
             #expect(throws: Never.self) { try Inclusion(of: nil, in: ...4).allowsNil().validate() }
+            #expect(throws: Never.self) { try Inclusion(of: nil, in: 2..<4).allowsNil().validate() }
         }
     }
 
@@ -77,18 +80,26 @@ struct InclusionTests {
     @MainActor
     func multipleValueInRange() throws {
         #expect(throws: Never.self) { try Inclusion(of: [2, 5], in: 2...).validate() }
+        #expect(throws: Never.self) { try Inclusion(of: [2, 5], in: 2...5).validate() }
         #expect(throws: ValidationError.self) { try Inclusion(of: [2, 5], in: 3...).validate() }
+        #expect(throws: ValidationError.self) { try Inclusion(of: [2, 5], in: 3..<5).validate() }
 
         XCTContext.runActivity(named: "nil value") { _ in
             #expect(throws: ValidationError.self) { try Inclusion(of: [Int]?.none, in: 0...).validate() }
+            #expect(throws: ValidationError.self) { try Inclusion(of: [Int]?.none, in: 0...1).validate() }
             #expect(throws: Never.self) { try Inclusion(of: [Int]?.none, in: 0...).allowsNil().validate() }
+            #expect(throws: Never.self) { try Inclusion(of: [Int]?.none, in: 0..<2).allowsNil().validate() }
             #expect(throws: Never.self) { try Inclusion(of: [Int]?.none, in: 0...).allowsNil().allowsEmpty().validate() }
+            #expect(throws: Never.self) { try Inclusion(of: [Int]?.none, in: ...1).allowsNil().allowsEmpty().validate() }
         }
 
         XCTContext.runActivity(named: "empty value") { _ in
             #expect(throws: ValidationError.self) { try Inclusion(of: [], in: 0...).validate() }
+            #expect(throws: ValidationError.self) { try Inclusion(of: [], in: 0..<2).validate() }
             #expect(throws: Never.self) { try Inclusion(of: [], in: 0...).allowsEmpty().validate() }
+            #expect(throws: Never.self) { try Inclusion(of: [], in: 0...3).allowsEmpty().validate() }
             #expect(throws: Never.self) { try Inclusion(of: [], in: 0...).allowsEmpty().allowsNil().validate() }
+            #expect(throws: Never.self) { try Inclusion(of: [], in: 0..<2).allowsEmpty().allowsNil().validate() }
         }
     }
 }

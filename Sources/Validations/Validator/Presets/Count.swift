@@ -34,7 +34,7 @@ public struct Count<Value: Collection, Range: RangeExpression<Int>>: Validator {
     }
 
     @inlinable
-    func allowsNil(_ enabled: Bool = true) -> Self {
+    public func allowsNil(_ enabled: Bool = true) -> Self {
         var `self` = self
         self.allowsNil = enabled
         return self
