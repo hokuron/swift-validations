@@ -23,7 +23,11 @@ struct ValidatorErrorKeyTests {
             }
         }
 
+        #if swift(>=6.0)
         #expect(SUT().validationErrors?.first?.key == AnyHashable(\SUT.name))
+        #else
+        #expect(SUT().validationErrors?.first?.key == AnyHashable((\SUT.name).hashValue))
+        #endif
     }
 
     @Test

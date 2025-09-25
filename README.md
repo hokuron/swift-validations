@@ -7,8 +7,40 @@ A library for building validations by defining rules in a declarative manner.
 This library offers several validators inspired by Ruby on Rails' Active Record. These validators provide general validation rules. If you need custom validators, you can create them by conforming to the `Validator` protocol.  
 When these validators fail, they throw errors that describe why and where the failure occurred.
 
-Built-in and custom validators can be incorporated into types like models using a declarative syntax to provide validation capabilities.
+Built-in and custom validators can be incorporated into types like models using a declarative syntax to provide validation capabilities. For built-in validators, Swift macros are also available as an alternative approach.
 
+### Using Swift Macros
+
+With Swift macros, you can define validations directly within your type using `@Validatable` and `#Validation` macros:
+
+```swift
+import Validations
+import RegexBuilder
+
+@Validatable
+struct User {
+    var name: String
+    var age: UInt
+    var email: String?
+    var bio: String?
+    var address: Address // Conforming Validator protocol or Validatable protocol.
+    var password: String
+    var confirmedPassword: String
+
+    #Validation(\Self.name, presence: .required)
+    #Validation(\Self.age, comparison: .greaterThan(16))
+    #Validation(\Self.email, format: /(?:\w+\.)*\w+@\w+(?:\.\w+)+/, presence: .(required(allowsNil: true)))
+    #Validation(\Self.bio, presence: .none)
+    #Validation(address)
+    #Validation(\Self.password, presence: .required(allowsEmpty: true))
+    
+    // Confirmation validation macro is not yet implemented.
+}
+```
+
+### Conforming `Validator` Protocol
+
+You can also manually implement the `Validator` protocol:
 
 ```swift
 import Validations
@@ -54,7 +86,11 @@ struct User: Validator {
         Confirmation(of: confirmedPassword, matching: password)
     }
 }
+```
 
+Both approaches are functionally equivalent:
+
+```swift
 let user = User(...)
 do {
     try user.validate()
@@ -62,6 +98,11 @@ do {
     //...
 }
 ```
+
+The macro approach automatically:
+- Generates the `Validatable` protocol conformance
+- Creates the `validation` computed property
+- Sets error keys using KeyPaths for better error tracking
 
 Additionally, each validator can be used independently.
 
@@ -90,6 +131,23 @@ do {
 
 These validators check if a value is `nil` or, in the case of collections, empty.  
 `Presence` fails if the value is `nil` or empty. `Absence` fails if the value is **not** `nil` or **not** empty.
+
+#### Using Macros
+
+```swift
+@Validatable
+struct Article {
+    var title: String
+    var email: String?
+    var cancellationDate: Date?
+
+    #Validation(\Self.title, presence: .required)
+    #Validation(\Self.email, presence: .required)
+    #Validation(\Self.cancellationDate, absence: .required)
+}
+```
+
+#### Conforming `Validator` Protocol
 
 ```swift
 Presence(of: name)
@@ -133,6 +191,44 @@ Confirmation(of: confirmedPassword, matching: password)
 
 This validator checks if a value matches a specified regular expression.
 
+#### Using Macros
+
+```swift
+@Validatable
+struct Product {
+    var productCode: String
+
+    #Validation(\Self.productCode, format: #/\A[a-zA-Z\d]+\z/#)
+    // or
+    #Validation(\Self.productCode, format: /\A[a-zA-Z\d]+\z/)
+}
+```
+
+You can also use `RegexBuilder` with macros:
+
+```swift
+import RegexBuilder
+
+@Validatable
+struct Product {
+    var productCode: String
+
+    #Validation(\Self.productCode, format: Regex {
+        Anchor.startOfSubject
+        OneOrMore {
+            CharacterClass(
+                ("a"..."z"),
+                ("A"..."Z"),
+                .digit
+            )
+        }
+        Anchor.endOfSubject
+    })
+}
+```
+
+#### Conforming `Validator` Protocol
+
 ```swift
 Format(of: productCode, with: #/\A[a-zA-Z\d]+\z/#)
 // or
@@ -174,8 +270,31 @@ Format(of: productCode, with: predefinedRegex)
 
 This validator checks the comparison between two values.
 
+#### Using Macros
+
+```swift
+@Validatable
+struct User {
+    var age: Int
+    var startDate: Date
+    var endDate: Date
+    var isAgreed: Bool
+
+    #Validation(\Self.age, comparison: .greaterThanOrEqualTo(13))
+    #Validation(\Self.startDate, comparison: .lessThanOrEqualTo(endDate))
+
+    // For equality comparison (Usable for types that conform to Equatable but not Comparable)
+    #Validation(\Self.isAgreed, equalTo: true)
+}
+```
+
+#### Conforming `Validator` Protocol
+
 ```swift
 Comparison(of: startDate, .lessThanOrEqualTo(endDate))
+
+// For equality comparison (Usable for types that conform to Equatable but not Comparable)
+Comparison(of: isAgreed, equalTo: true)
 ```
 
 The second argument specifies the comparison operator. 
@@ -184,6 +303,13 @@ The value to be validated generally needs to conform to Comparable.
 Although collections like Array do not conform to Comparable, if their elements do, they can be validated using this validator via the [`lexicographicallyPrecedes(_:)`](https://developer.apple.com/documentation/swift/sequence/lexicographicallyprecedes(_:)) method.
 
 ```swift
+@Validatable
+struct App {
+    var version = [5, 10, 0]
+    #Validation(\Self.version, comparison: .greaterThanOrEqualTo([6, 0, 0]))
+}
+App().isValid // => false
+
 let currentVersion = [5, 10, 0]
 let requiredVersion = [6, 0, 0]
 Comparison(of: currentVersion, .greaterThanOrEqualTo(requiredVersion)).isValid // => false
@@ -193,6 +319,34 @@ Comparison(of: currentVersion, .greaterThanOrEqualTo(requiredVersion)).isValid /
 
 These validators check for inclusion or exclusion within a set of values.  
 `Inclusion` fails if the value is not included in the specified set, while `Exclusion` fails if it is included.
+
+#### Using Macros
+
+```swift
+@Validatable
+struct Article {
+    enum Status {
+        case draft, published, secret, archived
+    }
+    enum Permission {
+        case reader, editor, admin
+    }
+
+    var status: Status
+    var permission: Permission
+    var age: Int
+
+    // Collection-based inclusion/exclusion
+    #Validation(\Self.status, inclusion: [.published, .secret])
+    #Validation(\Self.permission, exclusion: [.reader, .editor])
+
+    // Range-based inclusion/exclusion
+    #Validation(\Self.age, inclusion: 16...)
+    #Validation(\Self.age, exclusion: ..<16)
+}
+```
+
+#### Conforming `Validator` Protocol
 
 ```swift
 Inclusion(of: articleStatus, in: [.published, .secret])
@@ -210,6 +364,26 @@ Exclusion(of: age, from: ..<16)
 
 This validator checks if the count of a collection, including `String`, falls within a specified range.
 
+#### Using Macros
+
+```swift
+@Validatable
+struct User {
+    var interests: [String]
+    var username: String
+    var productCode: String
+
+    // Range-based count validation
+    #Validation(\Self.interests, countWithin: 3...)
+    #Validation(\Self.username, countWithin: 1..<20)
+
+    // Exact count validation
+    #Validation(\Self.productCode, countExact: 8)
+}
+```
+
+#### Conforming `Validator` Protocol
+
 ```swift
 Count(of: interests, within: 3...)
 Count(of: username, within: 1..<20)
@@ -219,6 +393,40 @@ Count(of: productCode, exact: 8)
 ### `AnyOf`
 
 This validator checks if any of the values provided in the first argument pass the validation specified in the second argument.
+
+#### Using Macros
+
+```swift
+@Validatable
+struct Contact {
+    var email1: String?
+    var email2: String?
+    var email3: String?
+    var givenName: String
+    var middleName: String
+    var familyName: String
+
+    #Validation(anyOf: \Self.email1, \.email2, \.email3) { email in
+        Format(of: email, with: /.*@.*\..*/)
+    }
+
+    #Validation(anyOf: \Self.givenName, \.middleName, \.familyName, pass: Presence.init)
+}
+```
+
+For types that already conform to `Validator`:
+
+```swift
+@Validatable
+struct Form {
+    var primaryAddress: Address // Address conforms to Validator or Validatable
+    var secondaryAddress: Address
+
+    #Validation(anyOf: \Self.primaryAddress, \.secondaryAddress)
+}
+```
+
+#### Conforming `Validator` Protocol
 
 ```swift
 import RegexBuilder
@@ -285,13 +493,39 @@ struct CustomValidator<Value>: Validator, PresenceValidatable {
 
 ## Validation Errors
 
-When validation fails, either a `ValidationError` or `ValidationErrors` is thrown. These errors correspond to whether the validation failure is singular or multiple, respectively.   
-For example, when using a validator independently (excluding `Validate`), a `ValidationError` is thrown upon validation failure.
+When validation fails, either a `ValidationError` or `ValidationErrors` is thrown. These errors correspond to whether the validation failure is singular or multiple, respectively.
 
 ### `ValidationError`
 
-`ValidationError` contains information about the validator that failed and the reason for the failure.   
-By default, information about the validator that failed is not retained, so if you want to identify the failed validator, you need to set the error key.
+`ValidationError` contains information about the validator that failed and the reason for the failure.
+
+When using macros, error keys are automatically set using KeyPaths:
+
+```swift
+@Validatable
+struct User {
+    var name: String
+    var email: String?
+
+    #Validation(\Self.name, presence: .required)
+    #Validation(\Self.email, format: /.*@.*\.*/)
+}
+// Error keys are automatically set to `\User.name` and `\User.email`
+```
+
+However, for some validation macros like `AnyOf`, you may need to explicitly specify an error key:
+
+```swift
+@Validatable
+struct Form {
+    var primaryAddress: Address // Address conforms to Validator or Validatable
+    var secondaryAddress: Address
+
+    #Validation(anyOf: \Self.primaryAddress, \.secondaryAddress, errorKey: "address")
+}
+```
+
+When manually implementing validators, you need to set error keys explicitly:
 
 ```swift
 struct User: Validator {
@@ -306,10 +540,7 @@ struct User: Validator {
 }
 ```
 
-In this example, the error key is set as a `KeyPath`, but any `Hashable` type, such as `String`, can be used.
-
-> [!NOTE]  
-> In the current version, you need to explicitly set error keys for each validator to identify the failure location. Future versions may automatically set these error keys.  
+In this example, the error key is set as a `KeyPath`, but any `Hashable` type, such as `String`, can be used.  
 
 You can also set the same error key for multiple validators. This is useful when incorporating validators into models.
 

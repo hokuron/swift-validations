@@ -40,9 +40,9 @@ struct FormatTests {
 
     @Test
     func nilValue() {
-        #expect(throws: ValidationError.self) { try Format(of: nil, with: /\A[a-zA-Z]+\z/).validate() }
-        #expect(throws: Never.self) { try Format(of: nil, with: /\A[a-zA-Z]+\z/).allowsNil().validate() }
-        #expect(throws: Never.self) { try Format(of: nil, with: /\A[a-zA-Z]+\z/).allowsNil().allowsEmpty().validate() }
+        #expect(throws: ValidationError.self) { try Format(of: String?.none, with: /\A[a-zA-Z]+\z/).validate() }
+        #expect(throws: Never.self) { try Format(of: String?.none, with: /\A[a-zA-Z]+\z/).allowsNil().validate() }
+        #expect(throws: Never.self) { try Format(of: String?.none, with: /\A[a-zA-Z]+\z/).allowsNil().allowsEmpty().validate() }
     }
 
     @Test

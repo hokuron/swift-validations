@@ -6,12 +6,12 @@ extension Validator {
 
     #if swift(>=6.0)
     @inlinable
-    public func errorKey<Root, Value>(_ keyPath: any KeyPath<Root, Value> & Sendable) -> some Validator {
+    public func errorKey<Root>(_: Root.Type = Root.self, _ keyPath: any PartialKeyPath<Root> & Sendable) -> some Validator {
         _ErrorKeyModifier(parent: self, errorKey: keyPath)
     }
     #else
     @inlinable
-    public func errorKey<Root, Value>(_ keyPath: KeyPath<Root, Value>) -> some Validator {
+    public func errorKey<Root>(_ keyPath: PartialKeyPath<Root>) -> some Validator {
         _ErrorKeyModifier(parent: self, errorKey: keyPath.hashValue)
     }
     #endif
@@ -29,12 +29,6 @@ struct _ErrorKeyModifier<Parent: Validator, Key: Hashable & Sendable>: Validator
     init(parent: Parent, errorKey: Key) {
         self.parent = parent
         self.errorKey = errorKey
-    }
-
-    @inlinable
-    init<R, V>(parent: Parent, errorKey keyPath: any KeyPath<R, V> & Sendable) where Key == any KeyPath<R, V> & Sendable {
-        self.parent = parent
-        self.errorKey = keyPath
     }
 
     @inlinable
