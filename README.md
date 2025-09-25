@@ -31,7 +31,7 @@ struct User {
     #Validation(\Self.age, comparison: .greaterThan(16))
     #Validation(\Self.email, format: /(?:\w+\.)*\w+@\w+(?:\.\w+)+/, presence: .(required(allowsNil: true)))
     #Validation(\Self.bio, presence: .none)
-    #Validation(address)
+    #Validation(\Self.address)
     #Validation(\Self.password, presence: .required(allowsEmpty: true))
     
     // Confirmation validation macro is not yet implemented.
