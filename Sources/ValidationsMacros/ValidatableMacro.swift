@@ -4,6 +4,9 @@ import SwiftSyntax
 import SwiftSyntaxBuilder
 import SwiftSyntaxMacros
 import SwiftBasicFormat
+#if !canImport(SwiftSyntax600)
+import SwiftSyntaxMacroExpansion
+#endif
 
 public struct ValidatableMacro: ExtensionMacro {
     public static func expansion(
