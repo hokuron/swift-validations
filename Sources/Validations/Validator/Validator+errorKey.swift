@@ -25,13 +25,13 @@ struct _ErrorKeyModifier<Parent: Validator, Key: Hashable & Sendable>: Validator
     @usableFromInline
     var errorKey: Key
 
-    @inlinable
+    @usableFromInline
     init(parent: Parent, errorKey: Key) {
         self.parent = parent
         self.errorKey = errorKey
     }
 
-    @inlinable
+    @usableFromInline
     func validate() throws {
         do {
             try parent.validate()

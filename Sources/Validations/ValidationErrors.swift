@@ -9,7 +9,7 @@ public struct ValidationErrors: Error, Hashable, Sendable {
     }
 
     @inlinable
-    var reasons: ValidationError.Reasons {
+    public var reasons: ValidationError.Reasons {
         errors.reduce([]) { $0.union($1.reasons) }
     }
 
