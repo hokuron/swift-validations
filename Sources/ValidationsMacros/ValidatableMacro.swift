@@ -62,7 +62,7 @@ public struct ValidatableMacro: ExtensionMacro {
                                 argument.presenceOption.map { "presence(\($0))" },
                                 "errorKey(Self.self, \(keyPath))",
                             ]
-                            .compactMap(\.self)
+                            .compactMap { $0 }
                         )
                     }
                 case .inclusion(let expression):
@@ -73,7 +73,7 @@ public struct ValidatableMacro: ExtensionMacro {
                                 argument.presenceOption.map { "presence(\($0))" },
                                 "errorKey(Self.self, \(keyPath))",
                             ]
-                            .compactMap(\.self)
+                            .compactMap { $0 }
                         )
                     }
                 case .exclusion(let expression):
@@ -84,7 +84,7 @@ public struct ValidatableMacro: ExtensionMacro {
                                 argument.presenceOption.map { "presence(\($0))" },
                                 "errorKey(Self.self, \(keyPath))",
                             ]
-                            .compactMap(\.self)
+                            .compactMap { $0 }
                         )
                     }
                 case .comparison(.equalTo(let expression)):
@@ -95,7 +95,7 @@ public struct ValidatableMacro: ExtensionMacro {
                                 argument.presenceOption.map { "presence(\($0))" },
                                 "errorKey(Self.self, \(keyPath))",
                             ]
-                            .compactMap(\.self)
+                            .compactMap { $0 }
                         )
                     }
                 case .comparison(.any(let expression)):
@@ -106,7 +106,7 @@ public struct ValidatableMacro: ExtensionMacro {
                                 argument.presenceOption.map { "presence(\($0))" },
                                 "errorKey(Self.self, \(keyPath))",
                             ]
-                            .compactMap(\.self)
+                            .compactMap { $0 }
                         )
                     }
                 case .count(.within(let expression)):
@@ -117,7 +117,7 @@ public struct ValidatableMacro: ExtensionMacro {
                                 argument.presenceOption.map { "allowsNil(\($0))" },
                                 "errorKey(Self.self, \(keyPath))",
                             ]
-                            .compactMap(\.self)
+                            .compactMap { $0 }
                         )
                     }
                 case .count(.exact(let expression)):
@@ -128,7 +128,7 @@ public struct ValidatableMacro: ExtensionMacro {
                                 argument.presenceOption.map { "allowsNil(\($0))" },
                                 "errorKey(Self.self, \(keyPath))",
                             ]
-                            .compactMap(\.self)
+                            .compactMap { $0 }
                         )
                     }
                 case .presence(let expression):
@@ -169,7 +169,7 @@ public struct ValidatableMacro: ExtensionMacro {
                             modifiers: [
                                 errorKey.map { "errorKey(\($0))" },
                             ]
-                            .compactMap(\.self)
+                            .compactMap { $0 }
                         )
                     ]
                 case .custom:
