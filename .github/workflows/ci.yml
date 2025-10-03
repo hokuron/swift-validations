@@ -27,3 +27,13 @@ jobs:
           swift test --parallel
           swift test --parallel -c release
 
+  check-macro-compatibility:
+    name: Check Macro Compatibility
+    runs-on: macos-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Swift Macro Compatibility Check
+        uses: Matejkob/swift-macro-compatibility-check@v1
+        with:
+          major-versions-only: true
